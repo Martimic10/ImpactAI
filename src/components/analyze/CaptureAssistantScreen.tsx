@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { CheckIcon } from "@/components/icons";
 
 type Angle = "dtl" | "faceOn";
@@ -444,29 +445,25 @@ function StepThree({
 
 function DTLIllustration() {
   return (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-      <circle cx="18" cy="8" r="4" fill="#2E7D32" opacity="0.7" />
-      <rect x="16" y="13" width="4" height="12" rx="2" fill="#2E7D32" opacity="0.6" />
-      <rect x="10" y="17" width="8" height="3" rx="1.5" fill="#2E7D32" opacity="0.5" />
-      <rect x="20" y="24" width="3" height="8" rx="1.5" fill="#2E7D32" opacity="0.5" transform="rotate(15 20 24)" />
-      <rect x="15" y="24" width="3" height="8" rx="1.5" fill="#2E7D32" opacity="0.5" transform="rotate(-5 15 24)" />
-      <rect x="2" y="16" width="6" height="4" rx="1" fill="#1B5E20" opacity="0.4" />
-      <circle cx="5" cy="18" r="1" fill="#2E7D32" opacity="0.7" />
-    </svg>
+    <Image
+      src="/downtheline-removebg-preview.png"
+      alt="Down the line"
+      width={48}
+      height={48}
+      className="w-10 h-10 object-contain"
+    />
   );
 }
 
 function FaceOnIllustration() {
   return (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-      <circle cx="18" cy="8" r="4" fill="#2E7D32" opacity="0.7" />
-      <rect x="16" y="13" width="4" height="12" rx="2" fill="#2E7D32" opacity="0.6" />
-      <rect x="12" y="16" width="12" height="3" rx="1.5" fill="#2E7D32" opacity="0.5" />
-      <rect x="20" y="24" width="3" height="8" rx="1.5" fill="#2E7D32" opacity="0.5" />
-      <rect x="15" y="24" width="3" height="8" rx="1.5" fill="#2E7D32" opacity="0.5" />
-      <rect x="27" y="14" width="6" height="4" rx="1" fill="#1B5E20" opacity="0.4" />
-      <circle cx="30" cy="16" r="1" fill="#2E7D32" opacity="0.7" />
-    </svg>
+    <Image
+      src="/facingyou-removebg-preview.png"
+      alt="Face on"
+      width={48}
+      height={48}
+      className="w-10 h-10 object-contain"
+    />
   );
 }
 
