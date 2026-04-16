@@ -1,6 +1,7 @@
 "use client";
 
-import { GolfFlagIcon, SearchPlusIcon, ActivityIcon, UserIcon } from "@/components/icons";
+import Image from "next/image";
+import { SearchPlusIcon, ActivityIcon, UserIcon } from "@/components/icons";
 
 type Tab = "analyze" | "history" | "profile";
 
@@ -36,12 +37,14 @@ export function DesktopSidebar({ activeTab, onTabChange }: DesktopSidebarProps) 
       {/* Logo */}
       <div className="px-6 py-6 mb-2">
         <div className="flex items-center gap-2.5">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: "linear-gradient(135deg, #1B5E20, #2E7D32)" }}
-          >
-            <GolfFlagIcon size={18} stroke="#FFFFFF" strokeWidth={2} />
-          </div>
+          <Image
+            src="/ImpactAI-logo-removebg-preview.png"
+            alt="ImpactAI logo"
+            width={40}
+            height={40}
+            priority
+            className="w-9 h-9 object-contain shrink-0"
+          />
           <div>
             <p className="font-extrabold text-base leading-none" style={{ color: "#111111", letterSpacing: "-0.03em" }}>
               ImpactAI
@@ -84,14 +87,21 @@ export function DesktopSidebar({ activeTab, onTabChange }: DesktopSidebarProps) 
 
       {/* Footer status */}
       <div className="px-6 py-6">
-        <div className="rounded-2xl p-4" style={{ background: "#F1F8E9", border: "1px solid #C8E6C9" }}>
+        <div className="rounded-2xl p-4" style={{ background: "linear-gradient(165deg, #F4FBF1 0%, #E8F5E9 100%)", border: "1px solid #A5D6A7" }}>
           <div className="flex items-center gap-2 mb-2">
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#2E7D32" }} />
-            <p className="text-xs font-semibold" style={{ color: "#1B5E20" }}>AI Coach Online</p>
+            <span className="w-2 h-2 rounded-full" style={{ background: "#2E7D32" }} />
+            <p className="text-xs font-semibold" style={{ color: "#1B5E20" }}>ImpactAI Pro</p>
           </div>
-          <p className="text-[11px] leading-snug" style={{ color: "#4CAF50" }}>
-            Ready to analyze your swing in seconds.
+          <p className="text-[11px] leading-snug mb-3" style={{ color: "#2E7D32" }}>
+            Unlock advanced swing insights, deeper analysis, and pro-level coaching plans.
           </p>
+          <button
+            onClick={() => onTabChange("profile")}
+            className="w-full h-9 rounded-xl text-xs font-bold text-white transition-transform active:scale-[0.98]"
+            style={{ background: "linear-gradient(135deg, #1B5E20, #2E7D32)" }}
+          >
+            Upgrade to Pro
+          </button>
         </div>
       </div>
     </aside>

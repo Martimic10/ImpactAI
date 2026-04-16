@@ -236,33 +236,109 @@ function StepTwo({
       </div>
 
       {/* Visual frame guide */}
-      <div className="relative rounded-3xl overflow-hidden mb-6 flex items-center justify-center"
-        style={{ height: 180, background: "#0F1A10" }}>
-        {/* Dashed framing box */}
-        <div className="absolute rounded-xl" style={{
-          inset: "20px 40px",
-          border: "2px dashed rgba(166,255,140,0.4)",
-        }} />
-        {/* Center line */}
-        <div className="absolute top-5 bottom-5 left-1/2 -translate-x-px w-px"
-          style={{ background: "rgba(166,255,140,0.25)" }} />
-        {/* Golfer silhouette */}
-        <div className="relative z-10 flex flex-col items-center">
-          <div className="w-4 h-4 rounded-full mb-1" style={{ background: "rgba(166,255,140,0.5)" }} />
-          <div className="w-1 h-10 rounded-full" style={{ background: "rgba(166,255,140,0.4)" }} />
-          <div className="w-8 h-1 rounded-full -mt-5 rotate-12" style={{ background: "rgba(166,255,140,0.35)" }} />
+      <div className="relative rounded-3xl overflow-hidden mb-6"
+        style={{ background: "linear-gradient(170deg, #0A1A0B 0%, #0F2210 60%, #0A1A0B 100%)" }}>
+        {/* Top label */}
+        <div className="absolute top-3 left-0 right-0 flex justify-center z-10">
+          <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full"
+            style={{ background: "rgba(166,255,140,0.12)", color: "rgba(166,255,140,0.7)" }}>
+            {config.guideLabel}
+          </span>
         </div>
-        <p className="absolute bottom-3 left-0 right-0 text-center text-[10px] font-semibold"
-          style={{ color: "rgba(166,255,140,0.6)" }}>
-          Keep entire body in frame
-        </p>
+
+        {/* Main content row */}
+        <div className="flex items-end justify-center gap-6 px-6 pt-10 pb-4">
+          {/* Phone frame (portrait) */}
+          <div className="relative flex flex-col items-center shrink-0">
+            <div className="relative rounded-2xl flex items-center justify-center"
+              style={{ width: 70, height: 120, border: "2.5px solid rgba(166,255,140,0.55)", background: "rgba(166,255,140,0.05)" }}>
+              {/* Phone notch */}
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full"
+                style={{ background: "rgba(166,255,140,0.3)" }} />
+              {/* Golfer in frame */}
+              <svg width="36" height="80" viewBox="0 0 36 80" fill="none">
+                {/* Head */}
+                <circle cx="18" cy="10" r="5" fill="rgba(166,255,140,0.6)" />
+                {/* Torso */}
+                <rect x="14" y="16" width="8" height="18" rx="3" fill="rgba(166,255,140,0.45)" />
+                {/* Club arm */}
+                <line x1="22" y1="22" x2="30" y2="30" stroke="rgba(166,255,140,0.5)" strokeWidth="2" strokeLinecap="round" />
+                {/* Club shaft */}
+                <line x1="30" y1="30" x2="34" y2="50" stroke="rgba(166,255,140,0.4)" strokeWidth="1.5" strokeLinecap="round" />
+                {/* Left leg */}
+                <rect x="13" y="32" width="5" height="22" rx="2.5" fill="rgba(166,255,140,0.4)" />
+                {/* Right leg */}
+                <rect x="19" y="32" width="5" height="22" rx="2.5" fill="rgba(166,255,140,0.4)" />
+                {/* Feet */}
+                <rect x="11" y="52" width="8" height="3" rx="1.5" fill="rgba(166,255,140,0.35)" />
+                <rect x="18" y="52" width="8" height="3" rx="1.5" fill="rgba(166,255,140,0.35)" />
+                {/* Ground line */}
+                <line x1="4" y1="57" x2="32" y2="57" stroke="rgba(166,255,140,0.2)" strokeWidth="1" />
+              </svg>
+              {/* Dashed frame overlay */}
+              <div className="absolute rounded-xl" style={{ inset: "14px 6px 6px 6px", border: "1.5px dashed rgba(166,255,140,0.25)" }} />
+            </div>
+            <p className="text-[10px] font-semibold mt-2" style={{ color: "rgba(166,255,140,0.5)" }}>Your phone</p>
+          </div>
+
+          {/* Arrow */}
+          <div className="flex flex-col items-center gap-1 pb-6">
+            <div className="flex items-center gap-1">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ background: `rgba(166,255,140,${0.2 + i * 0.15})` }} />
+              ))}
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M2 5h6M6 2l3 3-3 3" stroke="rgba(166,255,140,0.6)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <p className="text-[9px] font-medium" style={{ color: "rgba(166,255,140,0.4)" }}>
+              {config.lineDir === "vertical" ? "8–10 ft" : "10–12 ft"}
+            </p>
+          </div>
+
+          {/* Golfer position */}
+          <div className="flex flex-col items-center shrink-0 pb-2">
+            <svg width="48" height="90" viewBox="0 0 48 90" fill="none">
+              {/* Head */}
+              <circle cx="24" cy="10" r="6" fill="rgba(255,255,255,0.15)" stroke="rgba(166,255,140,0.5)" strokeWidth="1.5" />
+              {/* Torso */}
+              <path d="M18 18 Q24 16 30 18 L28 38 Q24 40 20 38 Z" fill="rgba(166,255,140,0.2)" stroke="rgba(166,255,140,0.4)" strokeWidth="1" />
+              {/* Club arm extended */}
+              <line x1="28" y1="24" x2="42" y2="32" stroke="rgba(166,255,140,0.5)" strokeWidth="2" strokeLinecap="round" />
+              {/* Club shaft */}
+              <line x1="42" y1="32" x2="46" y2="60" stroke="rgba(166,255,140,0.35)" strokeWidth="1.5" strokeLinecap="round" />
+              {/* Legs */}
+              <path d="M20 38 L17 62" stroke="rgba(166,255,140,0.4)" strokeWidth="4" strokeLinecap="round" />
+              <path d="M28 38 L31 62" stroke="rgba(166,255,140,0.4)" strokeWidth="4" strokeLinecap="round" />
+              {/* Shoes */}
+              <ellipse cx="16" cy="63" rx="5" ry="2" fill="rgba(166,255,140,0.3)" />
+              <ellipse cx="32" cy="63" rx="5" ry="2" fill="rgba(166,255,140,0.3)" />
+              {/* Ground */}
+              <line x1="4" y1="66" x2="44" y2="66" stroke="rgba(166,255,140,0.2)" strokeWidth="1.5" />
+              {/* Grass tufts */}
+              <line x1="8" y1="66" x2="7" y2="62" stroke="rgba(166,255,140,0.2)" strokeWidth="1" />
+              <line x1="14" y1="66" x2="13" y2="63" stroke="rgba(166,255,140,0.2)" strokeWidth="1" />
+              <line x1="36" y1="66" x2="35" y2="62" stroke="rgba(166,255,140,0.2)" strokeWidth="1" />
+            </svg>
+            <p className="text-[10px] font-semibold" style={{ color: "rgba(166,255,140,0.5)" }}>You</p>
+          </div>
+        </div>
+
+        {/* Bottom badge */}
+        <div className="flex justify-center pb-4">
+          <span className="text-[10px] font-semibold px-3 py-1.5 rounded-full"
+            style={{ background: "rgba(166,255,140,0.1)", color: "rgba(166,255,140,0.6)", border: "1px solid rgba(166,255,140,0.15)" }}>
+            Keep entire body in frame
+          </span>
+        </div>
       </div>
 
       {/* Tips */}
-      <div className="rounded-3xl p-5 mb-6 flex flex-col gap-3"
-        style={{ background: "#F9FAFB", border: "1px solid #E5E7EB" }}>
-        {config.tips.map((tip) => (
-          <div key={tip} className="flex items-center gap-3">
+      <div className="rounded-3xl mb-6 overflow-hidden"
+        style={{ border: "1px solid #E5E7EB" }}>
+        {config.tips.map((tip, i) => (
+          <div key={tip} className="flex items-center gap-3 px-5 py-3.5"
+            style={{ borderTop: i > 0 ? "1px solid #F3F4F6" : "none", background: "#FFFFFF" }}>
             <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center"
               style={{ background: "#F0FDF4" }}>
               <CheckIcon size={12} stroke="#2E7D32" strokeWidth={2.5} />

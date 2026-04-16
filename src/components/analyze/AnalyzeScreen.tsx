@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { GolfFlagIcon, RefreshIcon } from "@/components/icons";
+import Image from "next/image";
+import { RefreshIcon } from "@/components/icons";
 import { IdleScreen } from "./IdleScreen";
 import { CaptureAssistantScreen } from "./CaptureAssistantScreen";
 import { PreviewScreen } from "./PreviewScreen";
@@ -167,10 +168,14 @@ export function AnalyzeScreen() {
         }}
       >
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #1B5E20, #2E7D32)" }}>
-            <GolfFlagIcon size={14} stroke="#FFFFFF" strokeWidth={2.2} />
-          </div>
+          <Image
+            src="/ImpactAI-logo-removebg-preview.png"
+            alt="ImpactAI logo"
+            width={36}
+            height={36}
+            priority
+            className="w-8 h-8 object-contain"
+          />
           <span className="font-bold text-lg" style={{ color: "#1B5E20", letterSpacing: "-0.02em" }}>ImpactAI</span>
         </div>
         {(state === "uploading" || state === "analyzing") ? (

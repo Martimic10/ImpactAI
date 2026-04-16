@@ -218,9 +218,9 @@ function VideoPlayer({ url }: { url: string }) {
   }
 
   return (
-    <div className="rounded-2xl overflow-hidden" style={{ background: "#0A0A0A" }}>
+    <div className="rounded-2xl overflow-hidden flex flex-col items-center" style={{ background: "#0A0A0A" }}>
       {/* Video */}
-      <div className="relative" style={{ aspectRatio: "9/16", maxHeight: "360px" }}>
+      <div className="relative w-full" style={{ aspectRatio: "9/16", maxHeight: "360px" }}>
         <video
           ref={videoRef}
           src={url}
@@ -242,7 +242,7 @@ function VideoPlayer({ url }: { url: string }) {
       </div>
 
       {/* Controls */}
-      <div className="px-4 pt-3 pb-3" style={{ background: "#111111" }}>
+      <div className="w-full px-4 pt-3 pb-3" style={{ background: "#111111" }}>
         {/* Progress bar */}
         <div className="flex items-center gap-2 mb-3">
           <button onClick={togglePlay} className="shrink-0">
