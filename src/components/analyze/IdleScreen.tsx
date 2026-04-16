@@ -10,6 +10,7 @@ import {
 
 interface IdleScreenProps {
   onFileSelected: (file: File) => void;
+  onOpenCaptureAssistant: () => void;
 }
 
 const FEATURES = [
@@ -43,13 +44,13 @@ const TIPS = [
   "Keep the camera steady throughout the swing",
 ];
 
-export function IdleScreen({ onFileSelected }: IdleScreenProps) {
+export function IdleScreen({ onFileSelected, onOpenCaptureAssistant }: IdleScreenProps) {
   const uploadRef = useRef<HTMLInputElement>(null);
-  const recordRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) onFileSelected(file);
+    e.target.value = "";
   };
 
   return (
@@ -59,7 +60,7 @@ export function IdleScreen({ onFileSelected }: IdleScreenProps) {
         <MobileHero />
         <div className="px-5 pt-6 pb-4 flex flex-col gap-3">
           <UploadButton onClick={() => uploadRef.current?.click()} />
-          <RecordButton onClick={() => recordRef.current?.click()} />
+          <RecordButton onClick={onOpenCaptureAssistant} />
         </div>
         <div className="px-5 pb-4">
           <SectionLabel>What ImpactAI Analyzes</SectionLabel>
@@ -144,7 +145,7 @@ export function IdleScreen({ onFileSelected }: IdleScreenProps) {
             <p className="text-sm mb-6" style={{ color: "#6B7280" }}>Upload a video or record directly with your camera.</p>
             <div className="flex flex-col gap-3">
               <UploadButton onClick={() => uploadRef.current?.click()} />
-              <RecordButton onClick={() => recordRef.current?.click()} />
+              <RecordButton onClick={onOpenCaptureAssistant} />
             </div>
             <p className="text-xs mt-4 text-center" style={{ color: "#D1D5DB" }}>Supports MP4, MOV, AVI · Up to 500 MB</p>
           </div>
@@ -171,7 +172,6 @@ export function IdleScreen({ onFileSelected }: IdleScreenProps) {
       </div>
 
       <input ref={uploadRef} type="file" accept="video/*" className="hidden" onChange={handleFile} />
-      <input ref={recordRef} type="file" accept="video/*" capture="environment" className="hidden" onChange={handleFile} />
     </>
   );
 }

@@ -4,9 +4,10 @@ import { SwingIcon } from "@/components/icons";
 
 interface UploadingScreenProps {
   progress: number;
+  label?: string;
 }
 
-export function UploadingScreen({ progress }: UploadingScreenProps) {
+export function UploadingScreen({ progress, label }: UploadingScreenProps) {
   return (
     <div className="flex flex-col flex-1 overflow-y-auto">
       <div className="flex flex-col items-center justify-center flex-1 px-8 py-16 animate-fade-in">
@@ -18,7 +19,7 @@ export function UploadingScreen({ progress }: UploadingScreenProps) {
         </div>
 
         <h2 className="text-2xl font-bold mb-2 text-center" style={{ color: "#111111", letterSpacing: "-0.01em" }}>
-          Uploading your swing…
+          {label ?? "Uploading your swing…"}
         </h2>
         <p className="text-sm mb-8" style={{ color: "#6B7280" }}>This will only take a moment</p>
 

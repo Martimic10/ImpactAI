@@ -1,25 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, readFile, mkdir, rm } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
-import ffprobeInstaller from "@ffprobe-installer/ffprobe";
 
-// Wire up binaries
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
-ffmpeg.setFfprobePath(ffprobeInstaller.path);
-
-// Route config — allow long-running requests and large bodies
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const NUM_FRAMES = 6;
-const FRAME_QUALITY = 4;    // 1=best JPEG, 31=worst
-const FRAME_MAX_WIDTH = 768; // px — enough for vision analysis
-const MAX_FILE_SIZE_MB = 200;
+// ─── System prompt ────────────────────────────────────────────────────────────
 
 const SYSTEM_PROMPT = `You are a professional golf coach analyzing frames extracted from a swing video.
 
@@ -48,67 +32,7 @@ Return ONLY valid JSON — no markdown, no code blocks, no extra text:
   "confidence": <integer 1-10>
 }`;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function getVideoDuration(videoPath: string): Promise<number> {
-  return new Promise((resolve) => {
-    ffmpeg.ffprobe(videoPath, (err, metadata) => {
-      if (err || !metadata?.format?.duration) {
-        console.warn("ffprobe failed, defaulting to 5s duration:", err?.message);
-        resolve(5);
-      } else {
-        resolve(metadata.format.duration);
-      }
-    });
-  });
-}
-
-function extractSingleFrame(
-  videoPath: string,
-  timestamp: number,
-  outputPath: string
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    ffmpeg(videoPath)
-      .seekInput(Math.max(0, timestamp))
-      .frames(1)
-      .outputOptions([
-        `-q:v ${FRAME_QUALITY}`,
-        `-vf scale='min(${FRAME_MAX_WIDTH},iw)':-2`,
-      ])
-      .output(outputPath)
-      .on("end", () => resolve())
-      .on("error", (err) => reject(err))
-      .run();
-  });
-}
-
-async function extractFrames(
-  videoPath: string,
-  framesDir: string
-): Promise<string[]> {
-  const duration = await getVideoDuration(videoPath);
-
-  // Sample at 10%, 26%, 42%, 58%, 74%, 90% — avoids very start/end of clip
-  const percentages = [0.1, 0.26, 0.42, 0.58, 0.74, 0.9];
-  const framePaths: string[] = [];
-
-  for (let i = 0; i < NUM_FRAMES; i++) {
-    const timestamp = percentages[i] * duration;
-    const framePath = path.join(
-      framesDir,
-      `frame_${String(i + 1).padStart(3, "0")}.jpg`
-    );
-    try {
-      await extractSingleFrame(videoPath, timestamp, framePath);
-      framePaths.push(framePath);
-    } catch (err) {
-      console.warn(`Frame ${i + 1} extraction failed (ts=${timestamp.toFixed(2)}s):`, err);
-    }
-  }
-
-  return framePaths;
-}
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AnalysisResult {
   issue: string;
@@ -118,10 +42,12 @@ interface AnalysisResult {
   confidence: number;
 }
 
+// ─── OpenRouter call ──────────────────────────────────────────────────────────
+
 async function callOpenRouter(frameBase64s: string[]): Promise<AnalysisResult> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    throw new Error("OPENROUTER_API_KEY is not set in environment variables.");
+    throw new Error("OPENROUTER_API_KEY is not configured.");
   }
 
   const imageContent = frameBase64s.map((b64) => ({
@@ -173,7 +99,6 @@ async function callOpenRouter(frameBase64s: string[]): Promise<AnalysisResult> {
 
   const parsed = JSON.parse(jsonMatch[0]) as Partial<AnalysisResult>;
 
-  // Validate and normalise
   return {
     issue: String(parsed.issue ?? "Swing fault detected"),
     why: String(parsed.why ?? "The cause could not be determined from this footage."),
@@ -188,71 +113,35 @@ async function callOpenRouter(frameBase64s: string[]): Promise<AnalysisResult> {
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
-  const sessionId = randomUUID();
-  const sessionDir = path.join("/tmp", "impactai", sessionId);
-  const framesDir = path.join(sessionDir, "frames");
-
   try {
-    // 1. Parse multipart body
-    const formData = await request.formData();
-    const videoFile = formData.get("video") as File | null;
+    const body = await request.json() as { frames?: unknown };
+    const frames = body.frames;
 
-    if (!videoFile || videoFile.size === 0) {
+    if (!Array.isArray(frames) || frames.length === 0) {
       return NextResponse.json(
-        { error: "No video file received. Please select a video and try again." },
+        { error: "No frames received. Please try uploading again." },
         { status: 400 }
       );
     }
 
-    if (videoFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+    if (frames.length > 10) {
       return NextResponse.json(
-        { error: `Video is too large. Maximum size is ${MAX_FILE_SIZE_MB} MB.` },
-        { status: 413 }
+        { error: "Too many frames. Maximum is 10." },
+        { status: 400 }
       );
     }
 
-    // 2. Write video to temp storage
-    await mkdir(framesDir, { recursive: true });
-    const ext = (videoFile.name.split(".").pop() ?? "mp4").toLowerCase();
-    const videoPath = path.join(sessionDir, `video.${ext}`);
-    const videoBytes = Buffer.from(await videoFile.arrayBuffer());
-    await writeFile(videoPath, videoBytes);
-
-    console.log(`[${sessionId}] Video saved: ${(videoFile.size / 1024 / 1024).toFixed(1)} MB`);
-
-    // 3 + 4. Extract frames
-    const framePaths = await extractFrames(videoPath, framesDir);
-
-    if (framePaths.length === 0) {
-      return NextResponse.json(
-        { error: "Could not extract frames from this video. Please try a different file." },
-        { status: 422 }
-      );
-    }
-
-    console.log(`[${sessionId}] Extracted ${framePaths.length} frames`);
-
-    // 5. Read frames as base64
-    const frameBase64s = await Promise.all(
-      framePaths.map(async (p) => (await readFile(p)).toString("base64"))
-    );
-
-    // 6 + 7. Call OpenRouter
-    console.log(`[${sessionId}] Calling OpenRouter with ${frameBase64s.length} frames…`);
-    const result = await callOpenRouter(frameBase64s);
-    console.log(`[${sessionId}] Analysis complete: "${result.issue}"`);
-
-    // 8. Return structured response
+    const frameStrings = frames.map((f) => String(f));
+    const result = await callOpenRouter(frameStrings);
     return NextResponse.json(result);
 
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`[${sessionId}] Analysis failed:`, message);
+    console.error("Analysis error:", message);
 
-    // Surface useful error messages to the frontend
     if (message.includes("OPENROUTER_API_KEY")) {
       return NextResponse.json(
-        { error: "API key not configured. Add OPENROUTER_API_KEY to .env.local." },
+        { error: "API key not configured. Add OPENROUTER_API_KEY in your Vercel environment variables." },
         { status: 500 }
       );
     }
@@ -261,9 +150,5 @@ export async function POST(request: NextRequest) {
       { error: "Analysis failed. Please try again with a clearer video." },
       { status: 500 }
     );
-
-  } finally {
-    // 9. Always clean up temp files
-    rm(sessionDir, { recursive: true, force: true }).catch(() => {});
   }
 }

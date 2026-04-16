@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "ImpactAI – Golf Swing Coach",
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className="h-full bg-white antialiased overflow-hidden">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
